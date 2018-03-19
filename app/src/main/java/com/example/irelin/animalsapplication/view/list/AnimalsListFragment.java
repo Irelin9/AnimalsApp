@@ -40,7 +40,7 @@ public class AnimalsListFragment extends BaseFragment<AnimalsListPresenter> impl
     }
 
     public String getAnimalType() {
-        return animalType;
+        return getArguments().getString(ANIMAL_TYPE, animalType);
     }
 
     public static AnimalsListFragment newInstance(String animalType, Map<String, Object> savedState) {
@@ -101,9 +101,10 @@ public class AnimalsListFragment extends BaseFragment<AnimalsListPresenter> impl
     @Override
     public HashMap<String, Object> getSavedState() {
         HashMap<String, Object> state = super.getSavedState();
-        if (layoutManager != null) {
-            state.put(SCROLL_STATE, layoutManager.onSaveInstanceState());
-        }
+        state.put(ANIMAL_TYPE, getArguments().getString(ANIMAL_TYPE, animalType));
+        state.put(SCROLL_STATE, layoutManager != null
+                ? layoutManager.onSaveInstanceState()
+                : getArguments().getParcelable(SCROLL_STATE));
         return state;
     }
 

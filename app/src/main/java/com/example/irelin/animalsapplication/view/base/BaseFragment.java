@@ -91,7 +91,7 @@ public abstract class BaseFragment<Presenter extends BasePresenter> extends Frag
 
     public HashMap<String, Object> getSavedState() {
         HashMap<String, Object> state = new HashMap<>();
-        state.put(VIEW_ID, viewId);
+        state.put(VIEW_ID, getArguments().getInt(VIEW_ID, viewId));
         return state;
     }
 
