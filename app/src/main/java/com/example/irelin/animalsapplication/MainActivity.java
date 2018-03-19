@@ -20,12 +20,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String CURRENT_TAB = "CURRENT_TAB";
+    private static final int DETAILS_TAB = -1;
+
     @BindView(R.id.tabs)
     TabLayout tabs;
 
     private List<AnimalsListFragment> animalsListFragments;
-
-    private int currentTab = 0;
+    private int currentTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,13 +36,18 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initListFragments(savedInstanceState);
         initTabs();
-        goToAnimalsList(currentTab);
-        tabs.getTabAt(currentTab).select();
+        if (savedInstanceState != null) {
+            currentTab = savedInstanceState.getInt(CURRENT_TAB);
+        }
+        if (currentTab >= 0) {
+            openCurrentTab();
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_TAB, currentTab);
         for (AnimalsListFragment fragment : animalsListFragments) {
             fragment.saveState();
             outState.putSerializable(fragment.getAnimalType(), fragment.getSavedState());
@@ -77,11 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private AnimalsListFragment getFromStackOrNew(String animalType, Bundle savedInstanceState) {
         AnimalsListFragment fragment = (AnimalsListFragment) getSupportFragmentManager()
                 .findFragmentByTag(animalType);
-        int position = animalType.equals(Constants.CAT) ? 0 : 1;
-        if (fragment != null) {
-            currentTab = position;
-            return fragment;
-        }
+        if (fragment != null) return fragment;
         Map<String, Object> savedState = savedInstanceState == null ? null
                 : (Map<String, Object>) savedInstanceState.getSerializable(animalType);
         return AnimalsListFragment.newInstance(animalType, savedState);
@@ -89,11 +92,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void goToAnimalsList(int position) {
         AnimalsListFragment fragment = animalsListFragments.get(position);
-        openFragment(fragment, false, getTagByPosition(position));
+        openFragment(fragment, false, getTagByTabPosition(position));
     }
 
     public void goToAnimalsDetails(Animal animal) {
-        openFragment(AnimalDetailsFragment.newInstance(animal), true, null);
+        openFragment(AnimalDetailsFragment.newInstance(animal), true, Constants.DETAILS);
     }
 
     private void openFragment(Fragment fragment, boolean addToBackStack, String tag) {
@@ -105,11 +108,23 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
     }
 
-    private String getTagByPosition(int position) {
+    private void openCurrentTab() {
+        goToAnimalsList(currentTab);
+        tabs.getTabAt(currentTab).select();
+    }
+
+    private String getTagByTabPosition(int position) {
         return position == 0 ? Constants.CAT : Constants.DOG;
     }
 
-    public void setTabsVisibility(boolean isVisible) {
-        tabs.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    public void selectTab(String animalType) {
+        if (animalType.equals(Constants.DETAILS)) {
+            currentTab = DETAILS_TAB;
+            tabs.setVisibility(View.GONE);
+            return;
+        }
+        tabs.setVisibility(View.VISIBLE);
+        currentTab = animalType.equals(Constants.CAT) ? 0 : 1;
+        tabs.getTabAt(currentTab).select();
     }
 }

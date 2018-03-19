@@ -95,7 +95,7 @@ public class AnimalsListFragment extends BaseFragment<AnimalsListPresenter> impl
     @Override
     public void onResume() {
         super.onResume();
-        getMainActivity().setTabsVisibility(true);
+        getMainActivity().selectTab(animalType);
     }
 
     @Override

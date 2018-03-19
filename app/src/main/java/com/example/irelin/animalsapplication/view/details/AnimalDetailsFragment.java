@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.irelin.animalsapplication.MainActivity;
 import com.example.irelin.animalsapplication.R;
+import com.example.irelin.animalsapplication.custom.Constants;
 import com.example.irelin.animalsapplication.custom.ImageLoader;
 import com.example.irelin.animalsapplication.data.models.Animal;
 
@@ -58,6 +59,6 @@ public class AnimalDetailsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) getActivity()).setTabsVisibility(false);
+        ((MainActivity) getActivity()).selectTab(Constants.DETAILS);
     }
 }
